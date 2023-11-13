@@ -11,5 +11,5 @@
 
 [Model is defined in this file](app/api/chat/route.ts)
 
-
+[Available models on Ollama](https://ollama.ai/library)
 
