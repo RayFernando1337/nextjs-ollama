@@ -9,7 +9,7 @@
 
 ## How to change your model
 
-[Model is defined in this file](app/chat/route.ts)
+[Model is defined in this file](app/api/chat/route.ts)
 
 
 
