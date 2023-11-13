@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   const model = new ChatOllama({
     baseUrl: "http://localhost:11434", // Your server address
     model: "mistral", // Ollama model name, change this to change your model
-    temperature: 0.5,
+    temperature: 0,
   })  
 
   const stream = await model
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
     .stream(
       (messages as Message[]).map((m) =>
         m.role == "user"
-          ? new HumanMessage("You are Grok an AI assistant that responses in the style of Hitchhiker's guide to the Galaxy and be as humerous as possible whilst being helpful and providing accurate information\n" + m.content)
+          ? new HumanMessage(m.content)
           : new AIMessage(m.content)
       )
     )
