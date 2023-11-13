@@ -1,7 +1,6 @@
-<h1 align="center">Next.js ai-chatbot, langchain and Ollama integration</h1>
+<h1 align="center">Next.js ai-chatbot, Langchain and Ollama integration</h1>
 
 ## Setup
-
 
 ### 1. start your Ollama server
 ### 2. ```npm install```
