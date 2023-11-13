@@ -1,67 +1,27 @@
-import { kv } from '@vercel/kv'
-import { OpenAIStream, StreamingTextResponse } from 'ai'
-import { Configuration, OpenAIApi } from 'openai-edge'
-
-import { auth } from '@/auth'
-import { nanoid } from '@/lib/utils'
-
-export const runtime = 'edge'
-
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY
-})
-
-const openai = new OpenAIApi(configuration)
+import { StreamingTextResponse } from 'ai'
+import { AIMessage, HumanMessage } from 'langchain/schema'
+import { BytesOutputParser } from "langchain/schema/output_parser";
+import { ChatOllama } from "langchain/chat_models/ollama";
+import { Message } from 'ai';
 
 export async function POST(req: Request) {
-  const json = await req.json()
-  const { messages, previewToken } = json
-  const userId = (await auth())?.user.id
+  const { messages } = await req.json()
+  const parser = new BytesOutputParser();
 
-  if (!userId) {
-    return new Response('Unauthorized', {
-      status: 401
-    })
-  }
+  const model = new ChatOllama({
+    baseUrl: "http://localhost:11434", // Your server address
+    model: "mistral", // Your model name
+    temperature: 0.5,
+  })  
 
-  if (previewToken) {
-    configuration.apiKey = previewToken
-  }
-
-  const res = await openai.createChatCompletion({
-    model: 'gpt-3.5-turbo',
-    messages,
-    temperature: 0.7,
-    stream: true
-  })
-
-  const stream = OpenAIStream(res, {
-    async onCompletion(completion) {
-      const title = json.messages[0].content.substring(0, 100)
-      const id = json.id ?? nanoid()
-      const createdAt = Date.now()
-      const path = `/chat/${id}`
-      const payload = {
-        id,
-        title,
-        userId,
-        createdAt,
-        path,
-        messages: [
-          ...messages,
-          {
-            content: completion,
-            role: 'assistant'
-          }
-        ]
-      }
-      await kv.hmset(`chat:${id}`, payload)
-      await kv.zadd(`user:chat:${userId}`, {
-        score: createdAt,
-        member: `chat:${id}`
-      })
-    }
-  })
-
+  const stream = await model
+    .pipe(parser)
+    .stream(
+      (messages as Message[]).map((m) =>
+        m.role == "user"
+          ? new HumanMessage("You are Grok an AI assistant that responses in the style of Hitchhiker's guide to the Galaxy and be as humerous as possible whilst being helpful and providing accurate information\n" + m.content)
+          : new AIMessage(m.content)
+      )
+    )
   return new StreamingTextResponse(stream)
 }
