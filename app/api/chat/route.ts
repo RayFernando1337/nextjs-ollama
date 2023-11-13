@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
   const model = new ChatOllama({
     baseUrl: "http://localhost:11434", // Your server address
-    model: "mistral", // Your model name
+    model: "mistral", // Ollama model name, change this to change your model
     temperature: 0.5,
   })  
 
