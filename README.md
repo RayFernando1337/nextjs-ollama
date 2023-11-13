@@ -2,7 +2,8 @@
 
 ## Setup
 
-1.<p> Run your Ollama server</p>
-2. ```npm install```
-3. ```npm run dev```
+
+### 1. start your Ollama server
+### 2. ```npm install```
+### 3. ```npm run dev```
 
