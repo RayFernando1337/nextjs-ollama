@@ -3,5 +3,6 @@
 ## Setup
 
 1.<p> Run your Ollama server</p>
-2.<p> npm install</p>
-3.<p> npm run dev</p>
+2. ```npm install```
+3. ```npm run dev```
+
